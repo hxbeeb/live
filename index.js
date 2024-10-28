@@ -27,7 +27,7 @@ app.get('/', (req, res) => {
                     <input type="text" name="message" placeholder="Enter your message" required>
                     <button type="submit">Send</button>
                 </form>
-                <h2>Messages Received from Local Server:</h2>
+                <h2>Received Messages from Local Server:</h2>
                 <ul>${messageList}</ul>
             </body>
         </html>
@@ -37,12 +37,12 @@ app.get('/', (req, res) => {
 // Endpoint to send a message to the local server
 app.post('/send', async (req, res) => {
     const { message } = req.body;
-    const localServerUrl = 'https://d9c6-183-82-234-58.ngrok-free.app/receive-message'; // Your local server URL
+    const localServerUrl = 'https://d9c6-183-82-234-58.ngrok-free.app/receive-message'; // Change to your local server URL or ngrok
 
     try {
         // Send the message to the local server
         await axios.post(localServerUrl, { message });
-        
+
         // Redirect back to the homepage
         res.redirect('/');
     } catch (error) {
@@ -50,16 +50,15 @@ app.post('/send', async (req, res) => {
     }
 });
 
-// Endpoint to receive messages from the local server
+// Endpoint to receive a message from the local server
 app.post('/receive-message', (req, res) => {
     const { message } = req.body;
     console.log(`Received message from local server: ${message}`);
-    
+
     // Store the received message in the array
     receivedMessages.push(message);
-
-    // Respond back to the local server
-    res.json({ status: 'success', message: 'Message received' });
+    
+    res.json({ status: 'success', message: 'Message received!' });
 });
 
 // Start the live website
