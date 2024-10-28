@@ -9,8 +9,13 @@ const PORT = process.env.PORT || 5000;
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// Array to store messages received from the local server
+let messages = [];
+
 // Serve the HTML form to send messages to local server
 app.get('/', (req, res) => {
+    // Generate HTML with messages
+    const messageList = messages.map(msg => `<li>${msg}</li>`).join('');
     res.send(`
         <html>
             <head>
@@ -22,13 +27,15 @@ app.get('/', (req, res) => {
                     <input type="text" name="message" placeholder="Enter your message" required>
                     <button type="submit">Send</button>
                 </form>
+                <h2>Messages from Local Server:</h2>
+                <ul>${messageList}</ul>
             </body>
         </html>
     `);
 });
 
 // Endpoint to send a message to the local server
-app.post('/send-message', async (req, res) => {
+app.post('/send', async (req, res) => {
     const { message } = req.body;
     const localServerUrl = 'https://d9c6-183-82-234-58.ngrok-free.app/receive-message'; // Replace with your ngrok URL
 
@@ -41,28 +48,16 @@ app.post('/send-message', async (req, res) => {
 });
 
 // Endpoint to receive messages from the local server
-// Endpoint to receive messages from the live website
-app.post('/receive-message', async (req, res) => {
+app.post('/receive-message', (req, res) => {
     const { message } = req.body;
-    console.log(`Received message from live website: ${message}`);
+    console.log(`Received message from local server: ${message}`);
     
-    // Optionally send a message back to the live website
-    await sendMessageToLiveWebsite(message); // Call function to send message back
+    // Store the received message in the array
+    messages.push(message);
 
+    // Respond to the local server
     res.json({ status: 'success', message: `Received: ${message}` });
 });
-
-// Function to send a message back to the live website
-async function sendMessageToLiveWebsite(message) {
-    const liveWebsiteUrl = 'https://d9c6-183-82-234-58.ngrok-free.app/receive-message'; // Replace with your live website URL
-
-    try {
-        const response = await axios.post(liveWebsiteUrl, { message });
-        console.log(`Message sent to live website: ${response.data.message}`);
-    } catch (error) {
-        console.error('Failed to send message to live website:', error.message);
-    }
-}
 
 // Start the live website
 app.listen(PORT, () => {
