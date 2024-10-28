@@ -41,11 +41,28 @@ app.post('/send', async (req, res) => {
 });
 
 // Endpoint to receive messages from the local server
-app.post('/receive-message', (req, res) => {
+// Endpoint to receive messages from the live website
+app.post('/receive-message', async (req, res) => {
     const { message } = req.body;
-    console.log(`Received message from local server: ${message}`);
-    res.json({ status: 'success', message: 'Message received!' });
+    console.log(`Received message from live website: ${message}`);
+    
+    // Optionally send a message back to the live website
+    await sendMessageToLiveWebsite(message); // Call function to send message back
+
+    res.json({ status: 'success', message: `Received: ${message}` });
 });
+
+// Function to send a message back to the live website
+async function sendMessageToLiveWebsite(message) {
+    const liveWebsiteUrl = 'https://d9c6-183-82-234-58.ngrok-free.app/receive-message'; // Replace with your live website URL
+
+    try {
+        const response = await axios.post(liveWebsiteUrl, { message });
+        console.log(`Message sent to live website: ${response.data.message}`);
+    } catch (error) {
+        console.error('Failed to send message to live website:', error.message);
+    }
+}
 
 // Start the live website
 app.listen(PORT, () => {
