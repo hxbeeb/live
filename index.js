@@ -9,12 +9,8 @@ const PORT = process.env.PORT || 5000;
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Array to store messages
-let messages = [];
-
-// Serve the HTML form to send messages to the local server and display received messages
+// Serve the HTML form to send messages to local server
 app.get('/', (req, res) => {
-    const messageList = messages.map(msg => `<li>${msg}</li>`).join('');
     res.send(`
         <html>
             <head>
@@ -26,8 +22,6 @@ app.get('/', (req, res) => {
                     <input type="text" name="message" placeholder="Enter your message" required>
                     <button type="submit">Send</button>
                 </form>
-                <h2>Messages Received:</h2>
-                <ul>${messageList}</ul>
             </body>
         </html>
     `);
@@ -40,8 +34,7 @@ app.post('/send', async (req, res) => {
 
     try {
         const response = await axios.post(localServerUrl, { message });
-        messages.push(message); // Store the sent message to display it
-        res.send(`<h2>Message Sent: ${response.data.message}</h2><a href="/">Go Back</a>`);
+        res.send(`<h2>${response.data.message}</h2><a href="/">Go Back</a>`);
     } catch (error) {
         res.status(500).send('<h2>Failed to send message to local server</h2><a href="/">Go Back</a>');
     }
@@ -51,7 +44,6 @@ app.post('/send', async (req, res) => {
 app.post('/receive-message', (req, res) => {
     const { message } = req.body;
     console.log(`Received message from local server: ${message}`);
-    messages.push(message); // Store the received message to display it
     res.json({ status: 'success', message: 'Message received!' });
 });
 
