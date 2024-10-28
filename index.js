@@ -28,7 +28,7 @@ app.get('/', (req, res) => {
 });
 
 // Endpoint to send a message to the local server
-app.post('/send', async (req, res) => {
+app.post('/send-message', async (req, res) => {
     const { message } = req.body;
     const localServerUrl = 'https://d9c6-183-82-234-58.ngrok-free.app/receive-message'; // Replace with your ngrok URL
 
